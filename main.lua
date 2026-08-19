@@ -295,19 +295,37 @@ local selectedPlayer = nil
 local selectedAircraft = AIRCRAFT_OPTIONS[1]
 local toggleState = false
 local playeraircraft = nil
-local targetPosition = Vector3.new(-3393, 4, 20663) -- Default start target
+local targetPosition = Vector3.new(-3393, 4, 20663)
+local targetMarker = nil
 
--- CTRL + CLICK TO SET TARGET POSITION
+-- Create/update target marker function
+local function setTargetMarker(pos)
+	if not targetMarker or not targetMarker.Parent then
+		targetMarker = Instance.new("Part")
+		targetMarker.Name = "TargetMarker"
+		targetMarker.Shape = Enum.PartType.Ball
+		targetMarker.Size = Vector3.new(3, 3, 3)
+		targetMarker.Color = Color3.fromRGB(0, 255, 0)
+		targetMarker.Material = Enum.Material.Neon
+		targetMarker.Anchored = true
+		targetMarker.CanCollide = false
+		targetMarker.Parent = workspace
+	end
+	targetMarker.Position = pos
+end
+
+-- ALT + CLICK TO SET TARGET POSITION AND SPAWN NEON GREEN PART
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		local isCtrlHeld = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) 
-			or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+		local isAltHeld = UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) 
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightAlt)
 
-		if isCtrlHeld then
+		if isAltHeld then
 			if mouse.Hit then
 				targetPosition = mouse.Hit.Position
+				setTargetMarker(targetPosition)
 				print("Target position updated to:", targetPosition)
 			end
 		end
