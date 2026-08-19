@@ -168,7 +168,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 
 			local result = workspace:Raycast(viewportRay.Origin, viewportRay.Direction * 5000, raycastParams)
 			if result then
-				targetPosition = result.Position
+				targetPosition = result.Position+Vector3.new(0,15,0)
 				print("New fly target:", targetPosition)
 			end
 		end
