@@ -34,7 +34,7 @@ local function findClosestSpawner(position)
 			end
 		end
 	end
-
+    print(closestSpawner.Name)
 	return {
 		Spawner = closestSpawner,
 		AircraftSpawner = closestAircraftSpawner,
