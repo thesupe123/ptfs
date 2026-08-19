@@ -388,6 +388,7 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
 		playeraircraft = child
         local lastcf = player.Character.HumanoidRootPart.CFrame
         player.Character.HumanoidRootPart.CFrame = child.Main.Seats.PilotSeat.CFrame
+        task.wait(1)
         child.Internal.Scripts.RequestSeat:FireServer(child.Main.Seats.PilotSeat)
         task.wait(1)
         updateevent:FireServer(
