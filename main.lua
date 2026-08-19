@@ -500,7 +500,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         
         if playeraircraft.PrimaryPart then
-            flyToPosition(playeraircraft, Vector3.new(-43765, 28, -1399), 100)
+            flyToPosition(playeraircraft, Vector3.new(-3393, 4, 20663), 100)
         end
     end
 end)
