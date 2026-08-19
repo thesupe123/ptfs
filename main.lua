@@ -459,8 +459,16 @@ toggleButton.MouseButton1Click:Connect(function()
 end)
 game:GetService("RunService").PostSimulation:Connect(function()
     if toggleState and playeraircraft and selectedPlayer then
-        playeraircraft.PrimaryPart.CFrame = CFrame.new(selectedPlayer.Character.HumanoidRootPart.Position)
-        playeraircraft.PrimaryPart.AssemblyAngularVelocity = Vector3.new(200,200,200)
-        playeraircraft.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0,0,0)
+        local char = selectedPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        
+        if hrp and playeraircraft.PrimaryPart then
+            -- Keep current rotation, only update the position
+            local currentRotation = playeraircraft.PrimaryPart.CFrame.Rotation
+            playeraircraft.PrimaryPart.CFrame = CFrame.new(hrp.Position) * currentRotation
+            
+            playeraircraft.PrimaryPart.AssemblyAngularVelocity = Vector3.new(200, 200, 200)
+            playeraircraft.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
+        end
     end
 end)
