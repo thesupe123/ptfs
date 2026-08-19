@@ -227,7 +227,7 @@ end)
 local playeraircraft = nil
 
 workspace.Aircraft.ChildAdded:Connect(function(child)
-    if child.Internal:GetAttribute("SpawnedPlayer").Value == LocalPlayer.UserId then
+    if child.Internal:GetAttribute("SpawnedPlayer") == LocalPlayer.UserId then
         playeraircraft = child
     end
 end)
