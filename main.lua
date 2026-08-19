@@ -6,7 +6,7 @@ local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
-    "H135",
+    "H135 Police",
 	-- add more here
 }
 
@@ -385,7 +385,7 @@ dropdownButton.MouseButton1Click:Connect(function()
 		dropdownList.Size = UDim2.new(1, -20, 0, 0)
 	end
 end)
-
+print("the cool version")
 -- Aircraft dropdown open/close (closes player dropdown if open)
 aircraftButton.MouseButton1Click:Connect(function()
 	dropdownList.Visible = false
@@ -401,7 +401,43 @@ aircraftButton.MouseButton1Click:Connect(function()
 end)
 
 local playeraircraft = nil
+local RunService = game:GetService("RunService")
 
+local function flyToPosition(playeraircraft, targetPosition, speed, arriveThreshold)
+	speed = speed or 100 -- studs/second
+	arriveThreshold = arriveThreshold or 5 -- studs; how close counts as "arrived"
+
+	if not playeraircraft or not playeraircraft.PrimaryPart then
+		warn("flyToPosition: no aircraft or PrimaryPart")
+		return
+	end
+
+	local primaryPart = playeraircraft.PrimaryPart
+
+	local connection
+	connection = RunService.Heartbeat:Connect(function(dt)
+		-- stop if the aircraft got destroyed mid-flight
+		if not playeraircraft or not playeraircraft.Parent or not primaryPart or not primaryPart.Parent then
+			connection:Disconnect()
+			return
+		end
+
+		local currentPosition = primaryPart.CFrame.Position
+		local toTarget = targetPosition - currentPosition
+		local distance = toTarget.Magnitude
+
+		if distance <= arriveThreshold then
+			primaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+			connection:Disconnect()
+			return
+		end
+
+		local direction = toTarget.Unit
+		primaryPart.AssemblyLinearVelocity = direction * speed
+	end)
+
+	return connection -- caller can :Disconnect() early if needed
+end
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
@@ -463,11 +499,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         
         if hrp and playeraircraft.PrimaryPart then
-            -- Keep current rotation, only update the position
-            local currentRotation = playeraircraft.PrimaryPart.CFrame.Rotation
-            playeraircraft.PrimaryPart.CFrame = CFrame.new(Vector3.new(-3393, 4, 20663))
-            
-            playeraircraft.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
+            flyToPosition(playeraircraft, Vector3.new(-43765, 28, -1399), 100)
         end
     end
 end)
