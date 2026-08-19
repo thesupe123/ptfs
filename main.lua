@@ -277,7 +277,7 @@ toggleButton.MouseButton1Click:Connect(function()
 end)
 
 game:GetService("RunService").PostSimulation:Connect(function()
-    if toggleState and playeraircraft then
-        
+    if toggleState and playeraircraft and selectedPlayer then
+        playeraircraft.PrimaryPart.CFrame = CFrame.new(selectedPlayer.Character.HumanoidRootPart.Position)
     end
 end)
