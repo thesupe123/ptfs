@@ -1,5 +1,6 @@
 local replicatedStorage = game:GetService("ReplicatedStorage")
 
+
 local spawnevent = workspace.Spawners.SpawnAircraftRequest
 local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
@@ -385,6 +386,9 @@ local playeraircraft = nil
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
+        local lastcf = player.Character.HumanoidRootPart.CFrame
+        child.Internal.Scripts.RequestSeat:FireServer(child.Main.Seats.PilotSeat)
+        task.wait(1)
         updateevent:FireServer(
             false,
             false,
@@ -395,6 +399,8 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
             true,
             false
         )
+        task.wait(1)
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(lastcf)
 	end
 end)
 workspace.Aircraft.ChildRemoved:Connect(function(child)
