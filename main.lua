@@ -226,6 +226,12 @@ end)
 
 local playeraircraft = nil
 
+workspace.Aircraft.ChildAdded:Connect(function(child)
+    if child.Internal:GetAttribute("SpawnedPlayer").Value == LocalPlayer.UserId then
+        playeraircraft = child
+    end
+end)
+
 -- Toggle button behavior
 toggleButton.MouseButton1Click:Connect(function()
 	if not selectedPlayer then
@@ -264,8 +270,14 @@ toggleButton.MouseButton1Click:Connect(function()
 		-- NOTE: confirm what your server-side SpawnAircraftRequest actually
 		-- expects as its first argument (the AircraftSpawner instance, the
 		-- Spawner model, or the Index) — using AircraftSpawner here.
-		spawnevent:InvokeServer(closestspawner.AircraftSpawner, "B1 Lancer", false)
+		spawnevent:InvokeServer(closestspawner.AircraftSpawner, "Paratrike", false)
 	end
 
 	print(("Toggled %s for %s"):format(tostring(toggleState), selectedPlayer.Name))
+end)
+
+game:GetService("RunService").PostSimulation:Connect(function()
+    if toggleState and playeraircraft then
+        
+    end
 end)
