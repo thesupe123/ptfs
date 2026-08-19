@@ -429,7 +429,7 @@ toggleButton.MouseButton1Click:Connect(function()
 			return
 		end
 
-		local closestspawner = findClosestSpawner(hrp.Position)
+		local closestspawner = findClosestSpawner(player.Character.HumanoidRootPart.Position)
 		if not closestspawner.AircraftSpawner then
 			warn("No AircraftSpawner found")
 			return
