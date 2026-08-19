@@ -400,7 +400,7 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
             false
         )
         task.wait(1)
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(lastcf)
+        player.Character.HumanoidRootPart.CFrame = lastcf
 	end
 end)
 workspace.Aircraft.ChildRemoved:Connect(function(child)
