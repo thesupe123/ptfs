@@ -8,6 +8,7 @@ local AIRCRAFT_OPTIONS = {
 	"B1 Lancer",
     "H135 Police",
     "Airbus A350"
+	-- add more here
 }
 
 local function findClosestSpawner(position)
@@ -498,7 +499,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
         local char = selectedPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         
-        ifplayeraircraft.PrimaryPart then
+        if playeraircraft.PrimaryPart then
             flyToPosition(playeraircraft, Vector3.new(-43765, 28, -1399), 100)
         end
     end
