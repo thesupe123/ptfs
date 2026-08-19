@@ -6,6 +6,7 @@ local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
+    "H135",
 	-- add more here
 }
 
@@ -459,7 +460,7 @@ end)
 game:GetService("RunService").PostSimulation:Connect(function()
     if toggleState and playeraircraft and selectedPlayer then
         playeraircraft.PrimaryPart.CFrame = CFrame.new(selectedPlayer.Character.HumanoidRootPart.Position)
-        playeraircraft.AssemblyRotationalVelocity = Vector3.new(200,200,200)
+        playeraircraft.AssemblyAngularVelocity = Vector3.new(200,200,200)
         playeraircraft.AssemblyLinearVelocity = Vector3.new(0,0,0)
     end
 end)
