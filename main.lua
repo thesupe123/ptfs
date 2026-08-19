@@ -1,5 +1,7 @@
-local spawnevent = workspace.Spawners.SpawnAircraftRequest
+local replicatedStorage = game:GetService("ReplicatedStorage")
 
+local spawnevent = workspace.Spawners.SpawnAircraftRequest
+local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
@@ -383,7 +385,22 @@ local playeraircraft = nil
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
+        updateevent:FireServer(
+            false,
+            false,
+            true,
+            0,
+            false,
+            false,
+            true,
+            false
+        )
 	end
+end)
+workspace.Aircraft.ChildRemoved:Connect(function(child)
+    if child == playeraircraft then
+        playeraircraft = nil
+    end
 end)
 
 -- Toggle button behavior
