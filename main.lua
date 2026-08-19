@@ -16,25 +16,43 @@ local function findClosestSpawner(position)
 	local closestIndex = nil
 	local closestDistance = math.huge
 
-	for _, child in ipairs(spawners:GetChildren()) do
-		if child:IsA("Model") then
-			for index, subChild in ipairs(child:GetChildren()) do
-				if subChild.Name == "AircraftSpawner" then
-					local click = subChild:FindFirstChild("Click")
-					if click and click:IsA("BasePart") then
-						local distance = (click.Position - position).Magnitude
-						if distance < closestDistance then
-							closestDistance = distance
-							closestSpawner = child
-							closestAircraftSpawner = subChild
-							closestIndex = index
+	for _, descendant in ipairs(spawners:GetDescendants()) do
+		if descendant.Name == "AircraftSpawner" then
+			local click = descendant:FindFirstChild("Click")
+			if click and click:IsA("BasePart") then
+				local distance = (click.Position - position).Magnitude
+				if distance < closestDistance then
+					closestDistance = distance
+					closestAircraftSpawner = descendant
+
+					-- walk up from the AircraftSpawner until we hit the
+					-- top-level child of workspace.Spawners that owns it
+					local ancestor = descendant
+					while ancestor.Parent ~= spawners do
+						ancestor = ancestor.Parent
+						if ancestor == nil then
+							break
+						end
+					end
+					closestSpawner = ancestor
+
+					-- index of the AircraftSpawner within its immediate parent
+					local siblings = descendant.Parent:GetChildren()
+					for i, sibling in ipairs(siblings) do
+						if sibling == descendant then
+							closestIndex = i
+							break
 						end
 					end
 				end
 			end
 		end
 	end
-    print(closestSpawner.Name)
+
+	if closestSpawner then
+		print(closestSpawner.Name)
+	end
+
 	return {
 		Spawner = closestSpawner,
 		AircraftSpawner = closestAircraftSpawner,
