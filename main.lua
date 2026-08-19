@@ -8,7 +8,6 @@ local AIRCRAFT_OPTIONS = {
 	"B1 Lancer",
     "H135 Police",
     "Airbus A350"
-	-- add more here
 }
 
 local function findClosestSpawner(position)
