@@ -387,6 +387,7 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
         local lastcf = player.Character.HumanoidRootPart.CFrame
+        player.Character.HumanoidRootPart.CFrame = child.Main.Seats.PilotSeat.CFrame
         child.Internal.Scripts.RequestSeat:FireServer(child.Main.Seats.PilotSeat)
         task.wait(1)
         updateevent:FireServer(
