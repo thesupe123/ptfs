@@ -1,6 +1,6 @@
 local replicatedStorage = game:GetService("ReplicatedStorage")
 
-
+print("new a350")
 local spawnevent = workspace.Spawners.SpawnAircraftRequest
 local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
