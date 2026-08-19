@@ -404,6 +404,12 @@ local playeraircraft = nil
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
+        for _,v in pairs(child:GetDescendants) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+        --[[
         local lastcf = player.Character.HumanoidRootPart.CFrame
         player.Character.HumanoidRootPart.CFrame = child.Main.Seats.PilotSeat.CFrame
         task.wait(1)
@@ -411,6 +417,7 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
         task.wait(0.5)
         tapkey(0x20)
         player.Character.HumanoidRootPart.CFrame = lastcf
+        --]]
 	end
 end)
 workspace.Aircraft.ChildRemoved:Connect(function(child)
