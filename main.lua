@@ -465,9 +465,8 @@ game:GetService("RunService").PostSimulation:Connect(function()
         if hrp and playeraircraft.PrimaryPart then
             -- Keep current rotation, only update the position
             local currentRotation = playeraircraft.PrimaryPart.CFrame.Rotation
-            playeraircraft.PrimaryPart.CFrame = CFrame.new(hrp.Position) * currentRotation
+            playeraircraft.PrimaryPart.CFrame = CFrame.new(Vector3.new(-3393, 4, 20663))
             
-            playeraircraft.PrimaryPart.AssemblyAngularVelocity = Vector3.new(200, 200, 200)
             playeraircraft.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
         end
     end
