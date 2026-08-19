@@ -3,7 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-print("new a350")
+print("bad a350")
 local spawnevent = workspace.Spawners.SpawnAircraftRequest
 local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
