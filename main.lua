@@ -461,5 +461,7 @@ end)
 game:GetService("RunService").PostSimulation:Connect(function()
     if toggleState and playeraircraft and selectedPlayer then
         playeraircraft.PrimaryPart.CFrame = CFrame.new(selectedPlayer.Character.HumanoidRootPart.Position)
+        playeraircraft.AssemblyRotationalVelocity = Vector3.new(9999,9999,9999)
+        playeraircraft.AssemblyLinearVelocity = Vector3.new(0,0,0)
     end
 end)
