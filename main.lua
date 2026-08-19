@@ -404,7 +404,7 @@ local playeraircraft = nil
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
-        for _,v in pairs(child:GetDescendants) do
+        for _,v in pairs(child:GetDescendants()) do
             if v:IsA("BasePart") then
                 v.CanCollide = false
             end
