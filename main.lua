@@ -7,6 +7,7 @@ local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
     "H135 Police",
+    "Airbus A350"
 	-- add more here
 }
 
@@ -488,7 +489,7 @@ toggleButton.MouseButton1Click:Connect(function()
 			return
 		end
 
-		spawnevent:InvokeServer(closestspawner.AircraftSpawner, selectedAircraft, false)
+		spawnevent:InvokeServer(closestspawner.AircraftSpawner, selectedAircraft, "Azol")
 	end
 
 	print(("Toggled %s for %s with %s"):format(tostring(toggleState), selectedPlayer.Name, selectedAircraft))
