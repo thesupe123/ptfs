@@ -430,41 +430,46 @@ end)
 local playeraircraft = nil
 local RunService = game:GetService("RunService")
 
-local function flyToPosition(playeraircraft, targetPosition, speed, arriveThreshold)
+-- ===== Flight control =====
+-- Single persistent Heartbeat connection. Reads `targetPosition` live every
+-- tick (instead of taking it as a frozen parameter), so alt-clicking a new
+-- spot redirects the aircraft immediately without needing a new connection.
+local flightConnection = nil
+
+local function stopFlying()
+	if flightConnection then
+		flightConnection:Disconnect()
+		flightConnection = nil
+	end
+end
+
+local function startFlying(speed, arriveThreshold)
 	speed = speed or 100 -- studs/second
 	arriveThreshold = arriveThreshold or 5 -- studs; how close counts as "arrived"
 
-	if not playeraircraft or not playeraircraft.PrimaryPart then
-		warn("flyToPosition: no aircraft or PrimaryPart")
-		return
-	end
+	stopFlying() -- guard against ever double-connecting
 
-	local primaryPart = playeraircraft.PrimaryPart
-
-	local connection
-	connection = RunService.Heartbeat:Connect(function(dt)
-		-- stop if the aircraft got destroyed mid-flight
-		if not playeraircraft or not playeraircraft.Parent or not primaryPart or not primaryPart.Parent then
-			connection:Disconnect()
+	flightConnection = RunService.Heartbeat:Connect(function(dt)
+		if not playeraircraft or not playeraircraft.Parent or not playeraircraft.PrimaryPart then
+			stopFlying()
 			return
 		end
 
+		local primaryPart = playeraircraft.PrimaryPart
 		local currentPosition = primaryPart.CFrame.Position
-		local toTarget = targetPosition - currentPosition
+		local toTarget = targetPosition - currentPosition -- targetPosition read live each tick
 		local distance = toTarget.Magnitude
 
 		if distance <= arriveThreshold then
 			primaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-			connection:Disconnect()
-			return
+			return -- keep the connection alive; if targetPosition changes again it'll resume
 		end
 
 		local direction = toTarget.Unit
 		primaryPart.AssemblyLinearVelocity = direction * speed
 	end)
-
-	return connection -- caller can :Disconnect() early if needed
 end
+
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
@@ -473,11 +478,16 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
                 v.CanCollide = false
             end
         end
+
+		if toggleState then
+			startFlying(100)
+		end
 	end
 end)
 workspace.Aircraft.ChildRemoved:Connect(function(child)
     if child == playeraircraft then
         playeraircraft = nil
+        stopFlying()
     end
 end)
 
@@ -501,32 +511,30 @@ toggleButton.MouseButton1Click:Connect(function()
 		and Color3.fromRGB(40, 150, 70)
 		or Color3.fromRGB(120, 40, 40)
 
-	if playeraircraft == nil then
-		local character = selectedPlayer.Character
-		local hrp = character and character:FindFirstChild("HumanoidRootPart")
-		if not hrp then
-			warn("Selected player has no character/HumanoidRootPart to find a spawner near")
-			return
-		end
+	if toggleState then
+		if playeraircraft == nil then
+			local character = selectedPlayer.Character
+			local hrp = character and character:FindFirstChild("HumanoidRootPart")
+			if not hrp then
+				warn("Selected player has no character/HumanoidRootPart to find a spawner near")
+				return
+			end
 
-		local closestspawner = findClosestSpawner(player.Character.HumanoidRootPart.Position)
-		if not closestspawner.AircraftSpawner then
-			warn("No AircraftSpawner found")
-			return
-		end
+			local closestspawner = findClosestSpawner(player.Character.HumanoidRootPart.Position)
+			if not closestspawner.AircraftSpawner then
+				warn("No AircraftSpawner found")
+				return
+			end
 
-		spawnevent:InvokeServer(closestspawner.AircraftSpawner, selectedAircraft, false)
+			spawnevent:InvokeServer(closestspawner.AircraftSpawner, selectedAircraft, false)
+			-- flight starts automatically once ChildAdded fires for the new aircraft
+		else
+			-- aircraft already exists, just (re)start flying it
+			startFlying(100)
+		end
+	else
+		stopFlying()
 	end
 
 	print(("Toggled %s for %s with %s"):format(tostring(toggleState), selectedPlayer.Name, selectedAircraft))
-end)
-game:GetService("RunService").PostSimulation:Connect(function()
-    if toggleState and playeraircraft and selectedPlayer then
-        local char = selectedPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        
-        if hrp and playeraircraft.PrimaryPart then
-            flyToPosition(playeraircraft, targetPosition, 100)
-        end
-    end
 end)
