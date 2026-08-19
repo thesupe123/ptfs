@@ -1,4 +1,7 @@
 local replicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 print("new a350")
 local spawnevent = workspace.Spawners.SpawnAircraftRequest
@@ -6,8 +9,8 @@ local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
-    "H135 Police",
-    "Airbus A350"
+	"H135 Police",
+	"Airbus A350"
 	-- add more here
 }
 
@@ -27,8 +30,6 @@ local function findClosestSpawner(position)
 					closestDistance = distance
 					closestAircraftSpawner = descendant
 
-					-- walk up from the AircraftSpawner until we hit the
-					-- top-level child of workspace.Spawners that owns it
 					local ancestor = descendant
 					while ancestor.Parent ~= spawners do
 						ancestor = ancestor.Parent
@@ -38,7 +39,6 @@ local function findClosestSpawner(position)
 					end
 					closestSpawner = ancestor
 
-					-- index of the AircraftSpawner within its immediate parent
 					local siblings = descendant.Parent:GetChildren()
 					for i, sibling in ipairs(siblings) do
 						if sibling == descendant then
@@ -62,8 +62,8 @@ local function findClosestSpawner(position)
 	}
 end
 
-local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local mouse = player:GetMouse()
 
 -- ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -108,9 +108,8 @@ title.TextXAlignment = Enum.TextXAlignment.Left
 title.Text = "Admin Panel"
 title.Parent = titleBar
 
--- Dragging (drag by the title bar)
+-- Dragging logic
 do
-	local UserInputService = game:GetService("UserInputService")
 	local dragging = false
 	local dragStart, startPos
 	local dragInput
@@ -293,8 +292,27 @@ knobCorner.Parent = knob
 
 -- ===== State =====
 local selectedPlayer = nil
-local selectedAircraft = AIRCRAFT_OPTIONS[1] -- defaults to first entry, "Paratrike"
+local selectedAircraft = AIRCRAFT_OPTIONS[1]
 local toggleState = false
+local playeraircraft = nil
+local targetPosition = Vector3.new(-3393, 4, 20663) -- Default start target
+
+-- CTRL + CLICK TO SET TARGET POSITION
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		local isCtrlHeld = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) 
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+
+		if isCtrlHeld then
+			if mouse.Hit then
+				targetPosition = mouse.Hit.Position
+				print("Target position updated to:", targetPosition)
+			end
+		end
+	end
+end)
 
 -- Populate player dropdown
 local function refreshPlayerList()
@@ -332,7 +350,7 @@ local function refreshPlayerList()
 	end
 end
 
--- Populate aircraft dropdown (built once from AIRCRAFT_OPTIONS)
+-- Populate aircraft dropdown
 local function populateAircraftList()
 	for _, name in ipairs(AIRCRAFT_OPTIONS) do
 		local entry = Instance.new("TextButton")
@@ -354,7 +372,7 @@ local function populateAircraftList()
 		end)
 
 		entry.MouseButton1Click:Connect(function()
-			selectedAircraft = name -- <-- this is the variable you asked for
+			selectedAircraft = name
 			aircraftButton.Text = "  " .. name
 			aircraftList.Visible = false
 			aircraftList.Size = UDim2.new(1, -20, 0, 0)
@@ -373,7 +391,6 @@ Players.PlayerRemoving:Connect(function(plr)
 	task.defer(refreshPlayerList)
 end)
 
--- Player dropdown open/close (closes aircraft dropdown if open)
 dropdownButton.MouseButton1Click:Connect(function()
 	aircraftList.Visible = false
 	aircraftList.Size = UDim2.new(1, -20, 0, 0)
@@ -386,8 +403,7 @@ dropdownButton.MouseButton1Click:Connect(function()
 		dropdownList.Size = UDim2.new(1, -20, 0, 0)
 	end
 end)
-print("the cool version")
--- Aircraft dropdown open/close (closes player dropdown if open)
+
 aircraftButton.MouseButton1Click:Connect(function()
 	dropdownList.Visible = false
 	dropdownList.Size = UDim2.new(1, -20, 0, 0)
@@ -401,58 +417,21 @@ aircraftButton.MouseButton1Click:Connect(function()
 	end
 end)
 
-local playeraircraft = nil
-local RunService = game:GetService("RunService")
-
-local function flyToPosition(playeraircraft, targetPosition, speed, arriveThreshold)
-	speed = speed or 100 -- studs/second
-	arriveThreshold = arriveThreshold or 5 -- studs; how close counts as "arrived"
-
-	if not playeraircraft or not playeraircraft.PrimaryPart then
-		warn("flyToPosition: no aircraft or PrimaryPart")
-		return
-	end
-
-	local primaryPart = playeraircraft.PrimaryPart
-
-	local connection
-	connection = RunService.Heartbeat:Connect(function(dt)
-		-- stop if the aircraft got destroyed mid-flight
-		if not playeraircraft or not playeraircraft.Parent or not primaryPart or not primaryPart.Parent then
-			connection:Disconnect()
-			return
-		end
-
-		local currentPosition = primaryPart.CFrame.Position
-		local toTarget = targetPosition - currentPosition
-		local distance = toTarget.Magnitude
-
-		if distance <= arriveThreshold then
-			primaryPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-			connection:Disconnect()
-			return
-		end
-
-		local direction = toTarget.Unit
-		primaryPart.AssemblyLinearVelocity = direction * speed
-	end)
-
-	return connection -- caller can :Disconnect() early if needed
-end
 workspace.Aircraft.ChildAdded:Connect(function(child)
 	if child.Internal:GetAttribute("SpawnedPlayer") == player.UserId then
 		playeraircraft = child
-        for _,v in pairs(child:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.CanCollide = false
-            end
-        end
+		for _,v in pairs(child:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
 	end
 end)
+
 workspace.Aircraft.ChildRemoved:Connect(function(child)
-    if child == playeraircraft then
-        playeraircraft = nil
-    end
+	if child == playeraircraft then
+		playeraircraft = nil
+	end
 end)
 
 -- Toggle button behavior
@@ -494,13 +473,22 @@ toggleButton.MouseButton1Click:Connect(function()
 
 	print(("Toggled %s for %s with %s"):format(tostring(toggleState), selectedPlayer.Name, selectedAircraft))
 end)
-game:GetService("RunService").PostSimulation:Connect(function()
-    if toggleState and playeraircraft and selectedPlayer then
-        local char = selectedPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        
-        if playeraircraft.PrimaryPart then
-            flyToPosition(playeraircraft, Vector3.new(-3393, 4, 20663), 100)
-        end
-    end
+
+-- Fly loop driving directly towards targetPosition
+RunService.PostSimulation:Connect(function()
+	if toggleState and playeraircraft and selectedPlayer and targetPosition then
+		local primaryPart = playeraircraft.PrimaryPart
+		if primaryPart then
+			local currentPos = primaryPart.CFrame.Position
+			local toTarget = targetPosition - currentPos
+			local distance = toTarget.Magnitude
+
+			if distance <= 5 then
+				primaryPart.AssemblyLinearVelocity = Vector3.zero
+			else
+				local flySpeed = 100
+				primaryPart.AssemblyLinearVelocity = toTarget.Unit * flySpeed
+			end
+		end
+	end
 end)
