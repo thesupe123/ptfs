@@ -409,15 +409,6 @@ workspace.Aircraft.ChildAdded:Connect(function(child)
                 v.CanCollide = false
             end
         end
-        --[[
-        local lastcf = player.Character.HumanoidRootPart.CFrame
-        player.Character.HumanoidRootPart.CFrame = child.Main.Seats.PilotSeat.CFrame
-        task.wait(1)
-        tapkey(0x56)
-        task.wait(0.5)
-        tapkey(0x20)
-        player.Character.HumanoidRootPart.CFrame = lastcf
-        --]]
 	end
 end)
 workspace.Aircraft.ChildRemoved:Connect(function(child)
