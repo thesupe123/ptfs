@@ -6,7 +6,7 @@ local updateevent = replicatedStorage.Requests.Update
 local AIRCRAFT_OPTIONS = {
 	"Paratrike",
 	"B1 Lancer",
-    "H135",
+    "H135 Police",
 	-- add more here
 }
 
