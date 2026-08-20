@@ -9,7 +9,7 @@ local AIRCRAFT_OPTIONS = {
     "H135 Police",
 	-- add more here
 }
-
+print("big boob")
 local function findClosestSpawner(position)
 	local spawners = workspace.Spawners
 	local closestSpawner = nil
