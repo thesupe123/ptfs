@@ -532,12 +532,11 @@ toggleButton.MouseButton1Click:Connect(function()
 			-- aircraft already exists, just (re)start flying it
 			startFlying(100)
 		end
-    else
+	else
+		stopFlying()
         if playeraircraft then
             playeraircraft.PrimaryPart.Anchored = true
         end
-	else
-		stopFlying()
 	end
 
 	print(("Toggled %s for %s with %s"):format(tostring(toggleState), selectedPlayer.Name, selectedAircraft))
