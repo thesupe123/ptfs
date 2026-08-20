@@ -493,13 +493,7 @@ end)
 
 -- Toggle button behavior
 toggleButton.MouseButton1Click:Connect(function()
-	if not selectedPlayer then
-		local original = dropdownButton.Text
-		dropdownButton.Text = "  Select a player first!"
-		task.wait(1)
-		dropdownButton.Text = original
-		return
-	end
+
 
 	toggleState = not toggleState
 
