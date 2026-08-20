@@ -9,7 +9,7 @@ local AIRCRAFT_OPTIONS = {
     "H135 Police",
 	-- add more here
 }
-print("big boob")
+
 local function findClosestSpawner(position)
 	local spawners = workspace.Spawners
 	local closestSpawner = nil
@@ -168,7 +168,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 
 			local result = workspace:Raycast(viewportRay.Origin, viewportRay.Direction * 5000, raycastParams)
 			if result then
-				targetPosition = result.Position+Vector3.new(0,15,0)
+				targetPosition = result.Position+Vector3.new(0,10,0)
 				print("New fly target:", targetPosition)
 			end
 		end
@@ -493,7 +493,13 @@ end)
 
 -- Toggle button behavior
 toggleButton.MouseButton1Click:Connect(function()
-
+	if not selectedPlayer then
+		local original = dropdownButton.Text
+		dropdownButton.Text = "  Select a player first!"
+		task.wait(1)
+		dropdownButton.Text = original
+		return
+	end
 
 	toggleState = not toggleState
 
