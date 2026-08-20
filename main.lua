@@ -529,8 +529,7 @@ toggleButton.MouseButton1Click:Connect(function()
 			spawnevent:InvokeServer(closestspawner.AircraftSpawner, selectedAircraft, false)
 			-- flight starts automatically once ChildAdded fires for the new aircraft
 		else
-            playeraircraft.PrimaryPart.Anchored = false
-
+            
 			-- aircraft already exists, just (re)start flying it
 			startFlying(100)
 		end
