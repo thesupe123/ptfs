@@ -532,6 +532,10 @@ toggleButton.MouseButton1Click:Connect(function()
 			-- aircraft already exists, just (re)start flying it
 			startFlying(100)
 		end
+    else
+        if playeraircraft then
+            playeraircraft.PrimaryPart.Anchored = true
+        end
 	else
 		stopFlying()
 	end
